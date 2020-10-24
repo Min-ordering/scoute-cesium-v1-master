@@ -1,0 +1,27 @@
+.dimension-toggler {
+    display: flex;
+    width: 100px;
+    height: 30px;
+    position: absolute;
+    bottom: 10px;
+    left: 410px;
+    background: white;
+    border-radius: 15px;
+}
+
+.toggler-label {
+    width: 50px;
+    text-align: center;
+}
+
+.dimension-toggler .left {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    background: 'transparent';
+}
+
+.dimension-toggler .right {
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background: 'transparent';
+}

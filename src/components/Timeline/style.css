@@ -1,0 +1,52 @@
+.timeline-container {
+    position: absolute;
+    bottom: 60px;
+    right: 10px;
+    left: 400px;
+}
+
+.timeline-slider {
+    display: flex;
+    position: relative;
+}
+
+.timeline-circle-container {
+    width: 100%;
+    height: 55px;
+    align-items: center;
+    position: relative;
+}
+
+.timeline-circle {
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 5px;
+    left: calc(50% - 10px);
+    box-shadow: 0 0 5px 0.3px #000000;
+    z-index: 99999;
+    cursor: pointer;
+}
+.timeline-title {
+    color: #ffffff;
+    margin: 0;
+    text-align: center;
+    font-weight: bold;
+    text-shadow: 0 0 25px white;
+    cursor: pointer;
+}
+
+.timeline-cross-bar {
+    position: absolute;
+    left: 10%;
+    bottom: 13px;
+    right: 10%;
+    background: white;
+    height: 3px;
+}
+
+.timeline-flex-container {
+    position: relative;
+}

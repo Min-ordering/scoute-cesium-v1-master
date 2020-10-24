@@ -1,0 +1,127 @@
+.small-overview {
+  width: 120px;
+  height: 80px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.overview-text {
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-left: 10px;
+  padding-top: 12px;
+}
+
+.overview-box {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.overview-visible {
+  margin-top: 28px;
+  margin-left: 10px;
+}
+
+.layer-box {
+  display: flex;
+}
+
+.layer-milestone {
+  margin-left: 20px;
+  width: 4px;
+  background-color: rgba(2, 35, 63, 1);
+  position: relative;
+}
+
+.milestone-top-circle {
+  width: 10px;
+  height: 10px;
+  background: rgba(2, 35, 63, 1);;
+  position: absolute;
+  top: -5px;
+  left: -3px;
+  border-radius: 5px;
+}
+
+.milestone-bottom-circle {
+  width: 10px;
+  height: 10px;
+  background: rgba(2, 35, 63, 1);;
+  position: absolute;
+  bottom: -5px;
+  left: -3px;
+  border-radius: 5px;
+}
+
+.layers-view {
+  position: relative;
+}
+
+.project-name {
+  font-weight: bold;
+  padding-left: 15px;
+  color: rgba(2, 35, 63, 1);;
+  position: absolute;
+  bottom: -25px;
+}
+
+.layer-container {
+  height: calc(100vh - 190px);
+  overflow: auto;
+}
+
+.horizontal-dotted-box {
+  width: 18px;
+  height: 12px;
+  border-bottom: 1px dashed #999999;
+  margin-top: 10px;
+}
+
+
+.select-project svg {
+  color: #02233f;
+}
+
+.select-project .MuiOutlinedInput-input {
+  border: 1px solid #02233f;
+  padding: 10px;
+}
+
+.select-project .MuiSelect-select:focus {
+  border: #02233f;
+  border-radius: 4px;
+}
+
+.select-project .MuiSelect-icon {
+  top: calc(50% - 24px);
+  font-size: 3rem;
+}
+
+.sidebar .MuiCheckbox-root {
+  color: rgb(2 35 63);
+}
+
+.sidebar .MuiTypography-body1 {
+  font-size: 0.9em;
+}
+
+.project-tree .MuiSvgIcon-root {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.project-tree .MuiTreeItem-iconContainer {
+  margin-right: 8px;
+}
+
+/* .MuiTreeItem-root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label {
+
+} */
+
+.gis-type .chkParent-node {
+  background-color: #02233f !important;
+  color: white;
+}
+
+

@@ -1,0 +1,24 @@
+.bottom-tab-tool-bar {
+  background-color: rgba(2, 35, 63, 1);
+  height: 50px;
+  width: 396px;
+  position: absolute;
+  display: flex;
+  bottom: 0;
+}
+
+div.bottom-tab-icon {
+  color: white;
+  font-size: 18px;
+  width: 113px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  height: 45px;
+  padding-top: 5px;
+  text-align: center;
+}
+
+div.bottom-tab-icon:hover {
+  background-color: rgb(114, 149, 181);;
+}

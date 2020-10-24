@@ -1,0 +1,32 @@
+
+.upload-image-text-style {
+  text-align: center; }
+
+.upload-image-box {
+  background-color: #EBF1FF;
+  border: 2px dashed gray;
+  border-radius: 15px;
+  margin-bottom: 50px;
+  margin-top: 50px;
+  margin-left: 17.5%;
+  margin-right: 17.5%;
+  height: 30vh;
+  padding-top: calc(15vh - 70px); }
+
+.container {
+  margin-top: 27vh;
+  position: relative; }
+
+.upload-view {
+  width: calc(100% - 340px);
+}
+
+.upload-root-view {
+  width: 100%;
+  height: calc(100vh - 80px);
+  display: flex;
+}
+
+.default-svg {
+  margin-left: calc(50% - 40px);
+}

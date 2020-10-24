@@ -1,0 +1,38 @@
+.status-bar {
+    height: 30px;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: calc(100% - 550px);
+    background: white;
+    border-radius: 5px;
+    float: right;
+    cursor: pointer;
+}
+
+.datum-label-layout {
+    float: right;
+    margin-right: 10px;
+}
+
+.coordinates-label-layout {
+    float: right;
+    margin-left: 30px;
+    margin-right: 30px;
+}
+
+.elevation-label-layout {
+    float: right;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.status-common-margin {
+    height: 30px;
+}
+
+.status-bar-text {
+    font-weight: 600;
+    line-height: 30px;
+    margin: 0;
+}

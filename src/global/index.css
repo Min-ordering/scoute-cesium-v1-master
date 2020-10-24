@@ -1,0 +1,79 @@
+#cesiumContainer {
+  width: calc(100% - 340px);
+  height: calc(100vh - 80px);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100vh !important;
+}
+
+div.tab-bar {
+  background-color: rgba(2, 35, 63, 1);
+  height: 80px;
+  display: inline-flex;
+  width: 100%;
+  position: relative;
+}
+
+div.tab-icon {
+  color: white;
+  font-size: 18px;
+  width: 170px;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: inline-flex;
+  height: 80px;
+  cursor: pointer;
+}
+
+div.tab-icon:hover {
+  background-color: rgb(114, 149, 181);
+}
+
+.svg-tab-icon {
+  margin-top: 20px;
+  margin-left: 10px;
+  margin-right: 5px;
+}
+
+.app-name {
+  position: absolute;
+  top: -15px;
+  right: 20px;
+  font-size: 20px;
+  color: white;
+  bottom: 0;
+}
+
+.sidebar {
+  width: 409px;
+  border-right: 1px solid gray;
+  cursor: auto;
+  height: calc(100vh - 135px);
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.header {
+  cursor: auto;
+}
+.header-title {
+  font-weight: bold;
+  padding-left: 15px;
+}
+
+.input-box {
+  height: 36px;
+  margin-left: 15px;
+  width: 300px;
+}
+
+#projection-picker {
+  position: absolute;
+  left: 350px;
+  top: 90px;
+}

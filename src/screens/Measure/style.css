@@ -1,0 +1,36 @@
+.measure-tool-box {
+  display: flex;
+  margin-left: 15px;
+  margin-top: 30px;
+}
+
+.measure-tool {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(2, 35, 63, 1);
+  border: 1px solid white;
+}
+
+.measure-tool:hover {
+  background-color: rgb(114, 149, 181);
+}
+
+.value-display-box {
+  margin-left: 20px;
+  margin-top: 40px;
+}
+
+.measure-label {
+  color: rgba(2, 35, 63, 1);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  margin-top: 20px;
+}
+
+.measure-value {
+  color: rgba(2, 35, 63, 1);
+  font-size: 22px;
+  font-weight: bold;
+  margin: 0
+}

@@ -1,0 +1,170 @@
+.color-select-tool {
+  border: 1px solid cadetblue;
+  margin-left: 15px;
+  margin-right: 15px;
+  height: 29px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.color-view-container {
+  width: 51.66px;
+}
+.color-view {
+  width: 16px;
+  height: 16px;
+  border-radius: 10px;
+  margin-left: 17.83px;
+  margin-top: 7px;
+  cursor: pointer;
+}
+
+.annotation-container {
+  height: calc(100vh - 210px);
+  overflow: auto;
+}
+
+.annotation-view {
+  position: relative;
+}
+
+.annotation-body {
+  margin-right: 15px;
+  float: left;
+  width: calc(100% - 70px);
+}
+
+.annotation-icon {
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 5px;
+  cursor: pointer;
+  float: left;
+}
+
+.annotation-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.coordinate-text {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.comments-box {
+  border: 1px solid cadetblue;
+  margin-top: 15px;
+  padding-bottom: 15px;
+}
+
+.comments-title {
+  font-weight: bold;
+  text-transform: uppercase;
+  padding-left: 10px;
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+.each-comment-view {
+  padding-left: 10px;
+  position: relative;
+}
+
+.comment-content {
+  display: block;
+}
+
+.commentor {
+  font-weight: 500;
+  font-size: 15px;
+  padding-right: 10px;
+  margin: 0;
+  margin-top: 10px;
+}
+
+.comment-text {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  margin-top: 10px;
+  width: 230px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 10px;
+}
+
+.comment-date {
+  position: absolute;
+  right: 8px;
+  bottom: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: gray;
+}
+
+.add-comment-btn {
+  position: absolute;
+  top: 13px;
+  right: 5px;
+  border: 1px solid gray;
+  width: 120px;
+  height: 30px;
+  border-radius: 5px;
+  font-size: 11pt;
+  font-weight: 600;
+  background-color: #07233f;
+  color: white;
+  cursor: pointer;
+  outline: none;
+}
+
+.add-comment-box {
+  width: 299px;
+  margin-left: -30px;
+  position: relative;
+  height: 80px;
+  margin-top: 15px;
+}
+
+.user-icon {
+  width: 36px;
+  height: 36px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #07233f;
+  color: white;
+  border-radius: 25px;
+  text-align: center;
+  line-height: 36px;
+  float: left;
+}
+
+.thought-input {
+  float: left;
+  width: calc(100% - 55px);
+  margin-left: 15px;
+  height: 32px;
+  border: none;
+  border-bottom: 1px solid gray;
+  font-size: 15px;
+  padding-bottom: 0;
+  outline: none;
+}
+
+.thought-post-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 0;
+  height: 30px;
+  width: 70px;
+  font-size: 16px;
+  font-weight: 600;
+  background-color: #07233f;
+  outline: none;
+  border-radius: 5px;
+  border: none;
+  color: white;
+}
