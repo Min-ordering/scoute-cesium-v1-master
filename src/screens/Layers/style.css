@@ -106,22 +106,75 @@
   font-size: 0.9em;
 }
 
-.project-tree .MuiSvgIcon-root {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
 .project-tree .MuiTreeItem-iconContainer {
   margin-right: 8px;
 }
 
-/* .MuiTreeItem-root.Mui-selected > .MuiTreeItem-content .MuiTreeItem-label {
-
-} */
-
-.gis-type .chkParent-node {
+.e-checkbox-wrapper .e-frame.e-check, .e-css.e-checkbox-wrapper .e-frame.e-check {
   background-color: #02233f !important;
   color: white;
 }
 
+.e-treeview .e-list-item.e-active > .e-text-content .e-list-text {
+  color: #02233f;
+}
 
+.e-treeview .e-list-item.e-active.e-hover > .e-text-content .e-list-text {
+  color: #02233f;
+}
+
+.check-treeview .e-list-item.e-level-3 .e-checkbox-wrapper {
+  display: none;
+}
+
+.e-treeview .e-ul {
+  padding: 0 0 0 13px;
+}
+
+.e-treeview .e-list-text {
+  margin-left: 5px;
+  line-height: 23px;
+  min-height: 23px;
+  width: 90%;
+}
+
+.check-treeview .e-parent-active {
+  background-color: #02233f;
+  color: white !important;
+}
+
+.e-treeview .e-fullrow {
+  height: 25px !important;
+}
+
+.e-treeview > .e-ul {
+  overflow: hidden;
+}
+
+.e-css.e-checkbox-wrapper .e-stop {
+  background-color: #02233f !important;
+  color: white !important;
+  border-color: #02233f !important;
+}
+.e-checkbox-wrapper .e-stop::before, .e-css.e-checkbox-wrapper .e-stop::before {
+  content: '\e933';
+}
+
+.e-treeview .e-list-item.e-level-3 > .e-text-content .e-list-text {
+  padding: 0px;
+}
+
+.e-treeview .e-list-item .e-list-text {
+  color: #02233f;
+}
+
+.e-checkbox-wrapper .e-frame, .e-css.e-checkbox-wrapper .e-frame {
+  border-color: #02233f;
+  height: 20px;
+  width: 20px;
+  line-height: 13px;
+}
+
+.e-treeview .e-list-text {
+  font-size: 14px;
+}

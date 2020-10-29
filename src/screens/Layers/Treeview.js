@@ -1,11 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, createRef, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import SvgIcon from '@material-ui/core/SvgIcon';
-import { fade, makeStyles, withStyles } from '@material-ui/core/styles';
-import TreeView from '@material-ui/lab/TreeView';
-import TreeItem from '@material-ui/lab/TreeItem';
-import Collapse from '@material-ui/core/Collapse';
-import { useSpring, animated } from 'react-spring/web.cjs'; // web.cjs is required for IE 11 support
+//import TreeView from '@material-ui/lab/TreeView';
 import { compose } from 'recompose';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -16,83 +11,81 @@ import { Cesium } from '../../global/constant';
 import { projectActionCreators } from "../../store/project/actions";
 import { LAYER_TYPES } from '../../global/constant';
 import { sharedMVContext, mapStoreContext } from '../../global/AppContext';
-
-import Checkbox from '@material-ui/core/Checkbox';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { enableRipple } from '@syncfusion/ej2-base';
+import { TreeViewComponent } from '@syncfusion/ej2-react-navigations';
+enableRipple(true);
 
 const dateItemLabelInformation = {};
 function CustomizedTreeView(props) {
     let nodeIndex = 0;
-
-    const classes = useStyles();
     const { projects, assets, selectedAsset, setSelectedAsset, setSelectedTimelines } = props;
     const { mapView } = useContext(sharedMVContext);
     const mapStoreCtx = useContext(mapStoreContext);
-    const [selectedItem, setSelectedItem] = useState(['1']);
-    const [expandedNodes, setExpandedNodes] = useState([]);
-    const [childElements, setChildElements] = useState([]);
-    const [parentNodeIds, setParentNodeIds] = useState({});
     const [projectName, setProjectName] = useState('4');
-    const [childNodeIds, setChildNodeIds] = useState([]);
+    const [projectElements, setProjectElements] = useState([]);
+    const [checkedNodes, setCheckedNodes] = useState([]);
+    const [expandedNodes, setExpandedNodes] = useState([]);
+    const [fields, setFields] = useState({});
+    const treeViewRef = createRef();
 
     useEffect(() => {
-
         if (projects.length > 0) {
             _hideAllModels(mapStoreCtx.data);
-            setChildElements(_renderElements());
-            setExpandedNodes([]);
+            setProjectElements(_renderElements());
+            setExpandedNodes([])
         }
-
     }, [projects, projectName]);
 
     useEffect(() => {
+        treeViewRef.current.checkAll(checkedNodes);
+        _parentStyleChange();
+    }, [checkedNodes]);
 
+    useEffect(() => {
+        treeViewRef.current.expandAll(expandedNodes);
+    }, [expandedNodes]);
+
+    useEffect(() => {
+        if (projectElements.length > 0) {
+            setFields({ dataSource: projectElements, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChild' });
+        }
+    }, [projectElements]);
+
+    useEffect(() => {
         if (selectedAsset !== "") {
-
             const _selectedAsset = moment(selectedAsset, "YYYY-MM-DD").format("YYYYMMDD");
             if (dateItemLabelInformation['source'] !== 'self') {
-                setSelectedItem(dateItemLabelInformation[_selectedAsset]);
                 _parentNodeChange(dateItemLabelInformation[_selectedAsset], _selectedAsset);
-
-            } else {
-                _parentStyleChange();
             }
-
             dateItemLabelInformation['source'] = 'timeline';
-
         }
 
     }, [selectedAsset]);
-
-    useEffect(() => {
-        _parentStyleChange();
-    }, [expandedNodes])
 
     const _projectNameChange = (event) => {
         setProjectName(event.target.value);
     };
 
     const _parentNodeChange = (_nodeIds, _selectedAsset) => {
-
-        const _tempExpandedNodes = [];
+        const _checkedNodeIds = Object.keys(treeViewRef.current.getAllCheckedNodes());
+        const _expandedNodeIds = [];
         for (const expandedNode of expandedNodes) {
-            _tempExpandedNodes.push(expandedNode)
+            _expandedNodeIds.push(expandedNode);
         }
         for (const _nodeId of _nodeIds) {
-            _tempExpandedNodes.includes(_nodeId) > 0 ? _tempExpandedNodes : _tempExpandedNodes.push(_nodeId);
+            _checkedNodeIds.indexOf(_nodeId) > -1 ? _checkedNodeIds : _checkedNodeIds.push(_nodeId);
+            let pId = projectElements[_nodeId - 1].pid;
+            _expandedNodeIds.indexOf(pId) > -1 ? _expandedNodeIds : _expandedNodeIds.push(pId);
         }
-
         projects.map(project => {
             if (projectName == project.id) {
                 const _assets = _getAssetsOfProject(project.id);
                 for (const _asset of _assets) {
                     const _key = moment(_asset.ion_created_date).format("YYYYMMDD");
                     if (_selectedAsset == _key) {
-                        let index = "";
-                        index = parentNodeIds[_asset.layer_type];
-                        _tempExpandedNodes.includes(index) > 0 ? _tempExpandedNodes : _tempExpandedNodes.push(index);
                         const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
                         tileset.show = true;
                         mapView.viewer.flyTo(tileset);
@@ -100,18 +93,23 @@ function CustomizedTreeView(props) {
                 }
                 return;
             }
-
         });
-        setExpandedNodes(_tempExpandedNodes);
+        setCheckedNodes(_checkedNodeIds);
+        setExpandedNodes(_expandedNodeIds);
     }
 
     const _parentStyleChange = () => {
-        let allElements = document.querySelectorAll('.gis-type');
+        let allElements = document.querySelectorAll('.e-level-1');
         for (const aElement of allElements) {
-            if (aElement.querySelector('.Mui-expanded')) {
-                aElement.querySelector('.MuiTreeItem-label').classList.add("chkParent-node");
+            let isChecked = true;
+            const _iconHTMLText = aElement.querySelector('.e-text-content').querySelector(".e-frame").className;
+            isChecked = _iconHTMLText.includes("e-check")
+            if (isChecked) {
+                aElement.querySelector(".e-list-text").classList.add("e-parent-active");
+            } else if (_iconHTMLText.includes("e-stop")) {
+                aElement.querySelector(".e-list-text").classList.add("e-parent-active");
             } else {
-                aElement.querySelector('.MuiTreeItem-label').classList.remove("chkParent-node");
+                aElement.querySelector(".e-list-text").classList.remove("e-parent-active");
             }
         }
     }
@@ -138,10 +136,9 @@ function CustomizedTreeView(props) {
         }
     }
 
-    const _checkShowOrHide = (evt, _asset = null) => {
+    const _checkShowOrHide = (_evt, _asset = null) => {
         let isChecked = true;
-        isChecked = !evt.target.closest("li").classList.contains("Mui-expanded");
-
+        isChecked = _evt.target.className.includes("e-check");
         if (_asset && _asset.layer_type === LAYER_TYPES.DTM) {
             if (isChecked) {
                 mapView.viewer.terrainProvider =
@@ -160,7 +157,8 @@ function CustomizedTreeView(props) {
         return isChecked;
     }
 
-    const _navigateModel = (evt, _assets) => {
+    const _navigateModel = (isChecked, _assets) => {
+        const _timeLabels = [];
         for (const _asset of _assets) {
             if (_asset.layer_type === LAYER_TYPES.Orthomosaic) {
                 const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
@@ -181,74 +179,63 @@ function CustomizedTreeView(props) {
             } else if (_asset.layer_type === LAYER_TYPES.DSM) {
 
             }
+
+            const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
+            tileset.show = isChecked;
         }
 
-        _showHideModel(evt, _assets);
+        for (const _asset of _assets) {
+            let tempTimes = moment(_asset.ion_created_date).format("YYYY-MM-DD")
+            _timeLabels.includes(tempTimes) > 0 ? _timeLabels : _timeLabels.push(tempTimes);
+        }
+        setSelectedTimelines(_timeLabels);
     }
 
-    const _showHideModel = (evt, _assets) => {
+    const _showHideModel = (_evt, _assets) => {
         for (const _asset of _assets) {
-            const _willShow = _checkShowOrHide(evt, _asset);
+            const _willShow = _checkShowOrHide(_evt, _asset);
             const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
             tileset.show = _willShow;
+            mapView.viewer.flyTo(tileset);
         }
+        const _timeLabels = [];
+        for (const _asset of _assets) {
+            let tempTimes = moment(_asset.ion_created_date).format("YYYY-MM-DD")
+            _timeLabels.includes(tempTimes) > 0 ? _timeLabels : _timeLabels.push(tempTimes);
+        }
+        setSelectedTimelines(_timeLabels);
     }
 
     const _renderAssets = (_assets, _name) => {
         const uiAssets = [];
         const groupedAssets = _groupAssetsByType(_assets);
-        const tempParentIds = {};
-        const tempChildNodeIds = {};
         for (const _key in groupedAssets) {
-            const _childNodeIds = []
             if (groupedAssets[_key].length === 0) continue;
-
+            uiAssets.push(
+                { id: `${nodeIndex + 1}`, name: _key, hasChild: true, proData: groupedAssets[_key] },
+            );
+            const _parentId = nodeIndex + 1;
+            nodeIndex++;
             const _childs = [];
             for (const _asset of groupedAssets[_key]) {
                 const _creatDate = moment(_asset.ion_created_date).format("YYYYMMDD");
                 const label_name = _creatDate + "_" + _name.toUpperCase() + "_" + _asset.layer_type.toLowerCase();
                 _childs.push(
-                    <StyledTreeItem
-                        nodeId={`${nodeIndex + 1}`}
-                        label={label_name}
-                        key={`${nodeIndex + 1}`}
-                        expanded={expandedNodes}
-                        onIconClick={(evt) => _onDateIconClick(evt, _asset)}
-                        onLabelClick={(evt) => _onDateLabelClick(evt, _key, _asset)}
-                        className="date-label"
-                        id={`${nodeIndex + 1}`}
-                    >
-                        <StyledTreeItem nodeId={`${nodeIndex + 2}`} label="Annotations" />
-                        <StyledTreeItem nodeId={`${nodeIndex + 3}`} label="Measurements" />
-                    </StyledTreeItem>
+                    { id: `${nodeIndex + 1}`, pid: `${_parentId}`, name: label_name, proData: _asset },
                 );
+
                 if (!dateItemLabelInformation[_creatDate] || dateItemLabelInformation[_creatDate].includes(`${nodeIndex + 1}`) > 0) {
                     dateItemLabelInformation[_creatDate] = [];
                 }
                 dateItemLabelInformation[_creatDate].push(`${nodeIndex + 1}`);
-                _childNodeIds.push(`${nodeIndex + 1}`);
-                nodeIndex += 3;
+
+                nodeIndex++;
             }
 
-            uiAssets.push(
-                <StyledTreeItem
-                    nodeId={`${nodeIndex + 1}`}
-                    label={_key}
-                    key={nodeIndex + 1}
-                    onIconClick={(evt) => _showHideModel(evt, groupedAssets[_key])}
-                    onLabelClick={(evt) => _navigateModel(evt, groupedAssets[_key])}
-                    className="gis-type"
-                    id={`${nodeIndex + 1}`}
-                >
-                    {_childs}
-                </StyledTreeItem>
-            );
-            tempParentIds[_key] = `${nodeIndex + 1}`;
-            tempChildNodeIds[`${nodeIndex + 1}`] = _childNodeIds;
-            nodeIndex++;
+            for (const _child of _childs) {
+                uiAssets.push(_child);
+            }
         }
-        setChildNodeIds(tempChildNodeIds);
-        setParentNodeIds(tempParentIds);
         return uiAssets;
     }
 
@@ -256,41 +243,30 @@ function CustomizedTreeView(props) {
         const _willShow = _checkShowOrHide(_evt);
         const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
         tileset.show = _willShow;
+        mapView.viewer.flyTo(tileset);
     }
 
-    const _onDateLabelClick = (_evt, _key, _asset) => {
+    const _onDateLabelClick = (isChecked, _asset) => {
         const _timeLabels = [];
-        let isCheckParent = true;
         const _creatDate = moment(_asset.ion_created_date).format("YYYYMMDD");
         _timeLabels.push(moment(_asset.ion_created_date).format("YYYY-MM-DD"));
         setSelectedTimelines(_timeLabels);
-        setSelectedItem(dateItemLabelInformation[_creatDate]);
         setSelectedAsset(_creatDate);
         dateItemLabelInformation['source'] = 'self';
         const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
-        tileset.show = true;
+        tileset.show = isChecked;
         mapView.viewer.flyTo(tileset);
-        isCheckParent = Boolean(_evt.target.closest(".gis-type").querySelector('.Mui-expanded'));
-        _onDateIconClick(_evt, _asset);
-
     }
 
 
     const _renderProject = (_project) => {
         const _assets = _getAssetsOfProject(_project.id);
+        const _renAssets = _renderAssets(_assets, _project.project_name);
         const uiDirectories = [];
-        uiDirectories.push(_renderAssets(_assets, _project.project_name));
-        return uiDirectories
-    }
-
-    const _projectIconClicked = (_assets) => {
-
-        const _willShow = true;
-        for (const _asset of _assets) {
-            const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
-            tileset.show = _willShow;
+        for (const _asset of _renAssets) {
+            uiDirectories.push(_asset);
         }
-
+        return uiDirectories
     }
 
     const _projectLabelClicked = (_project) => {
@@ -308,11 +284,12 @@ function CustomizedTreeView(props) {
         for (const _project of projects) {
             if (projectName == _project.id) {
                 const _projectItemView = _renderProject(_project);
-                uiElements.push(_projectItemView);
+                for (const _projectItem of _projectItemView) {
+                    uiElements.push(_projectItem);
+                }
                 _projectLabelClicked(_project);
             }
         }
-
         return uiElements;
     }
 
@@ -326,50 +303,43 @@ function CustomizedTreeView(props) {
         return _assets;
     }
 
-    const _getAnnotationsOfAsset = (_projectID, _assetID) => {
-        const _annotations = [];
-        props.annotations.map(_annotation => {
-            if (_assetID === _annotation.asset_id && _projectID === _annotation.project_id) {
-                _annotations.push(_annotation);
-            }
-        });
-
-        return _annotation;
-    }
-
-    const onNodeToggle = (evt, _nodeIds) => {
-        let isParentCheck = true;
-        let isChildCheck = true;
-        let isCheck = true;
-        let isChilds = true;
-        let _currentNodeId = evt.target.closest("li").id;
-        let _parentNodeId = evt.target.closest(".gis-type").id;
-        let allChilds = evt.target.closest(".gis-type").querySelectorAll('.Mui-expanded');
-        isChilds = Boolean(evt.target.closest(".gis-type").classList.contains("Mui-expanded"));
-        isParentCheck = Boolean(evt.target.closest("li").classList.contains("gis-type"));
-        isChildCheck = Boolean(evt.target.closest("li").classList.contains("date-label"));
-        isCheck = Boolean(evt.target.closest("li").classList.contains("Mui-expanded"));
-        if (!isCheck) {
-            if (isParentCheck) {
-                for (const _childNodeId of childNodeIds[_currentNodeId]) {
-                    _nodeIds.push(_childNodeId);
-                }
-            }
-        } else {
-            if (isParentCheck) {
-                for (const _childNodeId of childNodeIds[_currentNodeId]) {
-                    let _index1 = _nodeIds.indexOf(_childNodeId);
-                    _nodeIds.splice(_index1, 1);
-                }
-            } else if (isChildCheck) {
-                if (allChilds.length == 1) {
-                    let _index2 = _nodeIds.indexOf(_parentNodeId);
-                    _nodeIds.splice(_index2, 1)
-                }
-            }
+    const _nodeExpand = (_evt, _nodeId) => {
+        const _expandedNodeIds = [];
+        for (const expandedNode of expandedNodes) {
+            _expandedNodeIds.push(expandedNode);
         }
-        setExpandedNodes(_nodeIds);
+        let index = _expandedNodeIds.indexOf(_nodeId);
+        index > -1 ? _expandedNodeIds.splice(index, 1) : _expandedNodeIds.push(_nodeId);
+        setExpandedNodes(_expandedNodeIds);
     }
+
+    const _nodeCheck = (_evt, _nodeId, _nodeLevel) => {
+        const _assets = projectElements[_nodeId - 1].proData;
+        _nodeLevel === "1" ? _showHideModel(_evt, _assets) : '';
+        _nodeLevel === "2" ? _onDateIconClick(_evt, _assets) : '';
+        _parentStyleChange();
+    }
+
+    const _nodeClick = (_evt) => {
+        const _nodeLevel = _evt.target.closest("li").getAttribute('aria-level');
+        const _nodeId = _evt.target.closest("li").getAttribute('data-uid');
+        if (_evt.target.className.includes("e-fullrow")) {
+            let isNodeChecked = true;
+            isNodeChecked = Boolean(_evt.target.nextSibling.querySelector(".e-check"));
+            if (_nodeLevel === "1") {
+                const _assets = projectElements[_nodeId - 1].proData;
+                _assets.length > 0 ? _navigateModel(isNodeChecked, _assets) : '';
+            } else if (_nodeLevel === "2") {
+                const _asset = projectElements[_nodeId - 1].proData;
+                _onDateLabelClick(isNodeChecked, _asset);
+            }
+        } else if (_evt.target.className.includes("e-frame")) {
+            _nodeCheck(_evt, _nodeId, _nodeLevel);
+        } else if (_evt.target.className.includes("interaction")) {
+            _nodeExpand(_evt, _nodeId);
+        }
+    }
+
     return (
         <div>
             <FormControl variant="outlined" className="select-project" style={{ padding: '20px', width: '90%' }}>
@@ -388,109 +358,18 @@ function CustomizedTreeView(props) {
                     </Select>
                 }
             </FormControl>
-            <TreeView
-                className={classes.root}
-                defaultCollapseIcon={<MinusSquare />}
-                defaultExpandIcon={<PlusSquare />}
-                defaultEndIcon={<CloseSquare />}
-                disableSelection={false}
-                selected={selectedItem}
-                onNodeToggle={(evt, values) => onNodeToggle(evt, values)}
-                onNodeSelect={(_, value) => setSelectedItem([`${value}`])}
-                expanded={expandedNodes}
-                className="project-tree"
-            >
-                {childElements}
-            </TreeView>
+            <TreeViewComponent
+                fields={fields}
+                ref={treeViewRef}
+                showCheckBox={true}
+                cssClass={'check-treeview'}
+                allowMultiSelection={true}
+                onClick={(_evt) => _nodeClick(_evt)}
+            />
         </div>
 
     );
 }
-
-function MinusSquare(props) {
-    return (
-        <Checkbox
-            style={{ width: 8, height: 8, color: '#02233f' }}
-            defaultChecked
-            inputProps={{ 'aria-label': 'checkbox with default color' }}
-        />
-    );
-}
-
-function PlusSquare(props) {
-    return (
-        <Checkbox
-            style={{ width: 8, height: 8 }}
-            color="default"
-            inputProps={{ 'aria-label': 'checkbox with default color' }}
-        />
-    );
-}
-
-function CloseSquare(props) {
-    return (
-        <SvgIcon className="close" fontSize="inherit" style={{ width: 14, height: 14 }} {...props}>
-            {/* tslint:disable-next-line: max-line-length */}
-            <path d="M8,5.14V19.14L19,12.14L8,5.14Z" />
-        </SvgIcon>
-    );
-}
-
-function TransitionComponent(props) {
-    const style = useSpring({
-        from: { opacity: 0, transform: 'translate3d(20px,0,0)' },
-        to: { opacity: props.in ? 1 : 0, transform: `translate3d(${props.in ? 0 : 20}px,0,0)` },
-    });
-
-    return (
-        <animated.div style={style}>
-            <Collapse {...props} />
-        </animated.div>
-    );
-}
-
-TransitionComponent.propTypes = {
-    /**
-     * Show the component; triggers the enter or exit states
-     */
-    in: PropTypes.bool,
-};
-
-const StyledTreeItem = withStyles((theme) => ({
-    root: {
-        marginTop: 10
-    },
-    iconContainer: {
-        '& .close': {
-            opacity: 0.3,
-        }
-    },
-    group: {
-        marginLeft: 7,
-        borderLeft: `1px dashed ${fade(theme.palette.text.primary, 0.4)}`,
-    },
-    label: {
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        '-webkit-line-clamp': 1,
-        display: '-webkit-box',
-        '-webkit-box-orient': 'vertical',
-        lineBreak: 'anywhere'
-    }
-}))((props) => (
-    <div style={{ display: 'flex' }}>
-        <div className="horizontal-dotted-box" />
-        <TreeItem {...props} TransitionComponent={TransitionComponent} />
-    </div>
-));
-
-const useStyles = makeStyles({
-    root: {
-        height: 264,
-        flexGrow: 1,
-        maxWidth: 400,
-    }
-});
 
 const mapStateToProps = state => ({
     projects: state.project.projects,
