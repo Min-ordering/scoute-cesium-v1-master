@@ -29,13 +29,14 @@ function CustomizedTreeView(props) {
     const [checkedNodes, setCheckedNodes] = useState([]);
     const [expandedNodes, setExpandedNodes] = useState([]);
     const [fields, setFields] = useState({});
+    const [showModels, setShowModels] = useState({})
     const treeViewRef = createRef();
 
     useEffect(() => {
         if (projects.length > 0) {
             _hideAllModels(mapStoreCtx.data);
             setProjectElements(_renderElements());
-            setExpandedNodes([])
+            setExpandedNodes([]);
         }
     }, [projects, projectName]);
 
@@ -51,6 +52,7 @@ function CustomizedTreeView(props) {
     useEffect(() => {
         if (projectElements.length > 0) {
             setFields({ dataSource: projectElements, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChild' });
+            _initialModelShow();
         }
     }, [projectElements]);
 
@@ -65,13 +67,19 @@ function CustomizedTreeView(props) {
 
     }, [selectedAsset]);
 
+    useEffect(() => {
+        _firstModelShow();
+    }, [showModels]);
+
     const _projectNameChange = (event) => {
         setProjectName(event.target.value);
     };
 
     const _parentNodeChange = (_nodeIds, _selectedAsset) => {
+        if (projectElements.length === 0) return;
         const _checkedNodeIds = Object.keys(treeViewRef.current.getAllCheckedNodes());
         const _expandedNodeIds = [];
+        const _showModels = Object.assign({}, showModels);
         for (const expandedNode of expandedNodes) {
             _expandedNodeIds.push(expandedNode);
         }
@@ -86,9 +94,7 @@ function CustomizedTreeView(props) {
                 for (const _asset of _assets) {
                     const _key = moment(_asset.ion_created_date).format("YYYYMMDD");
                     if (_selectedAsset == _key) {
-                        const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
-                        tileset.show = true;
-                        mapView.viewer.flyTo(tileset);
+                        _showModels['mId' + `${_asset.tile_url}`] = true;
                     }
                 }
                 return;
@@ -96,6 +102,7 @@ function CustomizedTreeView(props) {
         });
         setCheckedNodes(_checkedNodeIds);
         setExpandedNodes(_expandedNodeIds);
+        setShowModels(_showModels);
     }
 
     const _parentStyleChange = () => {
@@ -103,7 +110,7 @@ function CustomizedTreeView(props) {
         for (const aElement of allElements) {
             let isChecked = true;
             const _iconHTMLText = aElement.querySelector('.e-text-content').querySelector(".e-frame").className;
-            isChecked = _iconHTMLText.includes("e-check")
+            isChecked = _iconHTMLText.includes("e-check");
             if (isChecked) {
                 aElement.querySelector(".e-list-text").classList.add("e-parent-active");
             } else if (_iconHTMLText.includes("e-stop")) {
@@ -192,18 +199,21 @@ function CustomizedTreeView(props) {
     }
 
     const _showHideModel = (_evt, _assets) => {
+        const _showModels = Object.assign({}, showModels);
         for (const _asset of _assets) {
             const _willShow = _checkShowOrHide(_evt, _asset);
-            const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
-            tileset.show = _willShow;
-            mapView.viewer.flyTo(tileset);
+            _willShow ? _showModels['mId' + `${_asset.tile_url}`] = true : _showModels['mId' + `${_asset.tile_url}`] = false;
         }
         const _timeLabels = [];
-        for (const _asset of _assets) {
-            let tempTimes = moment(_asset.ion_created_date).format("YYYY-MM-DD")
-            _timeLabels.includes(tempTimes) > 0 ? _timeLabels : _timeLabels.push(tempTimes);
+        const isChecked = _checkShowOrHide(_evt);
+        if (isChecked) {
+            for (const _asset of _assets) {
+                let tempTimes = moment(_asset.ion_created_date).format("YYYY-MM-DD")
+                _timeLabels.includes(tempTimes) > 0 ? _timeLabels : _timeLabels.push(tempTimes);
+            }
+            setSelectedTimelines(_timeLabels);
         }
-        setSelectedTimelines(_timeLabels);
+        setShowModels(_showModels);
     }
 
     const _renderAssets = (_assets, _name) => {
@@ -241,23 +251,49 @@ function CustomizedTreeView(props) {
 
     const _onDateIconClick = (_evt, _asset) => {
         const _willShow = _checkShowOrHide(_evt);
-        const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
-        tileset.show = _willShow;
-        mapView.viewer.flyTo(tileset);
+        if (_willShow) {
+            const _timeLabels = [];
+            const _creatDate = moment(_asset.ion_created_date).format("YYYY-MM-DD");
+            _timeLabels.push(_creatDate);
+            setSelectedTimelines(_timeLabels);
+            dateItemLabelInformation['source'] = 'self';
+        }
+        _setShowModel(_asset.tile_url, _willShow);
+    }
+
+    const _firstModelShow = () => {
+        let index = 0;
+        for (const key in showModels) {
+            const tileset = mapStoreCtx.data.projects[projectName].assets[key.slice(3)].entity;
+            if (showModels[key] && index === 0) {
+                tileset.show = true;
+                mapView.viewer.flyTo(tileset);
+                index++;
+            } else {
+                tileset.show = false;
+            }
+        }
+    }
+
+    const _initialModelShow = () => {
+        const _showModels = {};
+        for (const projectElement of projectElements) {
+            if (!projectElement.hasChild) _showModels['mId' + `${projectElement.proData.tile_url}`] = false;
+        }
+        setShowModels(_showModels);
+    }
+
+    const _setShowModel = (_assetTileUrl, isChecked) => {
+        const _showModels = Object.assign({}, showModels);
+        isChecked ? _showModels['mId' + `${_assetTileUrl}`] = true : _showModels['mId' + `${_assetTileUrl}`] = false;
+        setShowModels(_showModels);
     }
 
     const _onDateLabelClick = (isChecked, _asset) => {
-        const _timeLabels = [];
-        const _creatDate = moment(_asset.ion_created_date).format("YYYYMMDD");
-        _timeLabels.push(moment(_asset.ion_created_date).format("YYYY-MM-DD"));
-        setSelectedTimelines(_timeLabels);
-        setSelectedAsset(_creatDate);
-        dateItemLabelInformation['source'] = 'self';
         const tileset = mapStoreCtx.data.projects[_asset.project_id].assets[_asset.tile_url].entity;
         tileset.show = isChecked;
         mapView.viewer.flyTo(tileset);
     }
-
 
     const _renderProject = (_project) => {
         const _assets = _getAssetsOfProject(_project.id);

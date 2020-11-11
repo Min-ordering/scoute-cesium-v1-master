@@ -54,9 +54,12 @@ function Timeline(props) {
     }, [selectedTimelines]);
 
     useEffect(() => {
-        const _index = timeLabels.indexOf(selectedAsset);
-        _handleSelected(_index);
-    }, [selectedAsset]);
+        if (timeLabels.length > 0) {
+            const _clone = Array(4).fill(false);
+            _clone[0] = true;
+            setSelected(_clone);
+        }
+    }, [timeLabels])
 
     return (
         <div className="timeline-container">
