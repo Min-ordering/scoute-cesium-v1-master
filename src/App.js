@@ -62,6 +62,7 @@ function App() {
   const updateComments = (annotation_id, comment) => {
     mapStore.annotations[annotation_id].conversations.push(comment);
     setMapStore(mapStore);
+    console.log("this is test")
   }
 
   return (
